@@ -5,17 +5,17 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 
 public class HoneyComb {
 	
-
 	//a map storing every character in all its appearances in the HoneyComb 
 	private Map<Character, ArrayList<Cell>> honeyCombData = new HashMap<Character, ArrayList<Cell>>();
 	//a map storing elements in every level 
-	private Map<Integer, ArrayList<Cell>> levelToChars = new HashMap<Integer, ArrayList<Cell>>();
+	private List<char[]> levelToChars = null;
 	
 	private int getLevel(int idx){
 		return (idx-1)/6+1;
@@ -72,16 +72,18 @@ public class HoneyComb {
 		try {
 			InputStream ins = new FileInputStream(new File(honeyCombFile));
 			Scanner scanner = new Scanner(ins);
-			int levelTotal = scanner.nextInt();
-			int totalCharCount = levelTotal*(levelTotal+1)*3+1;
-			honeyCombInArray = new char[totalCharCount];
-			int idx = 0;
-			for(int i=0;i<levelTotal;i++){
+			int totalLevelCount = scanner.nextInt();
+			levelToChars = new ArrayList<char[]>();
+			for(int i=0;i<totalLevelCount;i++){
 				String content = scanner.nextLine();
-				setTheNeighbors(i,data);
-				for(char c : content.toCharArray()){
-					honeyCombInArray[idx++] = c;
+				char[] chars = content.toCharArray();
+				for(int k=0;k<chars.length;k++){
+					if(!honeyCombData.containsKey(chars[k])){
+						honeyCombData.put(chars[k], new ArrayList<Cell>());
+					}
+					honeyCombData.get(chars[k]).add(new Cell(i,k));
 				}
+				levelToChars.add(chars);
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
@@ -96,8 +98,8 @@ public class HoneyComb {
 			System.out.println(str);
 		}
 	}
-
 }
+
 class Cell{
 	int level; 
 	int idx;
